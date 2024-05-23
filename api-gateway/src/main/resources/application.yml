@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      mvc:
+        routes[0]:
+          id: microservice-inventory
+#          uri: http://localhost:8083
+          uri: lb://microservice-inventory
+          predicates[0]: Path=/api/inventory/**
+        routes[1]:
+          id: microservice-orders
+          uri: lb://microservice-orders
+          predicates[0]: Path=/api/order/**
+        routes[2]:
+          id: microservice-products
+          uri: lb://microservice-products
+          predicates[0]: Path=/api/product/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance.instance_id:${random.value}}
+
+
+# Log
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        cloud:
+          gateway: trace
+          gateway.route.RouteDefinitionRouteLocator: info
+
